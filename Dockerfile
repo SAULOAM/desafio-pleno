@@ -5,7 +5,7 @@ FROM python:3.9-slim AS builder
 WORKDIR /app
 
 # Copia o arquivo de dependências 
-COPY requirements.txt .
+COPY app/requirements.txt .
 
 # Instalamos as dependências em uma pasta local usando -t (target)
 RUN pip install --no-cache-dir -r requirements.txt -t /app/libs
@@ -21,7 +21,7 @@ WORKDIR /app
 COPY --from=builder /app/libs /app/libs
 
 # Copiamos o código da aplicação
-COPY . .
+COPY app .
 
 # Definimos para o Python onde ele deve procurar as bibliotecas e modulos do import
 ENV PYTHONPATH=/app/libs
