@@ -35,6 +35,12 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Create Terraform State Bucket
+        run: |
+          # Tenta criar o bucket se ele não existir. O comando '|| true' impede que o job falhe se o bucket já existir.
+          gcloud storage buckets create gs://terraform-state-projeto-globo-489614 --location=us-central1 || true
+          echo "Bucket verificado/criado."
+
       - name: Terraform Init
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" init
 
