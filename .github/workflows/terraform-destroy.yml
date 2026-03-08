@@ -3,6 +3,11 @@ name: 'Terraform Destroy GCP'
 on:
   workflow_call:
   workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Digite "DESTROY" para confirmar a destruição da infraestrutura'
+        required: true
+        default: ''
 
 jobs:
   terraform:
@@ -37,5 +42,5 @@ jobs:
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" init
 
       - name: Terraform Destroy
-        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.confirmation == 'DESTROY')
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" destroy -auto-approve

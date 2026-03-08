@@ -32,7 +32,35 @@ jobs:
     uses: ./.github/workflows/app-deploy.yml
     secrets: inherit
 
-  terraform-destroy:
+  display-endpoint:
     needs: app-deploy
-    uses: ./.github/workflows/terraform-destroy.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool-globo/providers/github-pool-globo'
+          service_account: 'github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com'
+
+      - name: Get GKE Credentials
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: 'desafio-pleno-cluster'
+          location: 'us-central1'
+
+      - name: Show Public IP
+        run: |
+          echo "Buscando serviços no cluster..."
+          kubectl get services
+          EXTERNAL_IP=$(kubectl get service -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+          if [ -n "$EXTERNAL_IP" ]; then
+            echo "::notice title=API Endpoint::http://$EXTERNAL_IP:8000"
+            echo "--------------------------------------------------"
+            echo "API disponível em: http://$EXTERNAL_IP:8000"
+            echo "--------------------------------------------------"
+          else
+            echo "::warning::IP externo ainda pendente ou não encontrado."
+          fi
