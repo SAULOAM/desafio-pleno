@@ -29,3 +29,15 @@
 
 8.  **Depuração do SonarCloud**:
     *   Encontrei novamente o erro `exit code 3` do SonarScanner. Após verificar que o `SONAR_TOKEN` estava correto, identifiquei que o nome da organização (`sonar.organization`) estava incorreto. Corrigi de `sauloam` para `globo-test`, que é a organização correta no SonarCloud.
+
+9.  **Ajuste Fino do SonarCloud**:
+    *   O erro `exit code 3` persistiu. A causa provável é que a `sonar.projectKey` (`SAULOAM_desafio-pleno`) está associada à organização antiga. A chave do projeto é única *dentro* de uma organização. Ajustei a chave para um novo padrão (`globo-test_desafio-pleno`) e verifiquei se ela corresponde exatamente à chave do projeto configurada na UI do SonarCloud para a organização `globo-test`.
+
+10. **Diagnóstico Final do SonarCloud**:
+    *   Confirmado que a organização `globo-test` não possuía repositórios configurados. O erro ocorria porque o scanner tentava enviar análise para um projeto inexistente. A ação corretiva é criar/importar o projeto manualmente na interface do SonarCloud dentro da organização correta e atualizar o `sonar.projectKey` no arquivo de propriedades com o valor gerado pela plataforma.
+
+11. **Retorno para Organização Pessoal**:
+    *   Decidi reverter a configuração do SonarCloud para a organização `sauloam` (SAULOAM), onde o projeto já estava configurado ou é mais fácil de gerenciar, simplificando a resolução do erro de "Project not found".
+
+12. **Correção da Chave do Projeto**:
+    *   Atualizei a `sonar.projectKey` para `sauloam` no arquivo de propriedades, garantindo que corresponda exatamente à chave definida no projeto dentro do SonarCloud.
