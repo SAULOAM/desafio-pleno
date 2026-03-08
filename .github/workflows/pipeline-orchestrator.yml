@@ -13,8 +13,13 @@ jobs:
   demo:
     uses: ./.github/workflows/github-actions-demo.yml
 
-  auth-deploy:
+  sonar-scan:
     needs: demo
+    uses: ./.github/workflows/sonar-scan.yml
+    secrets: inherit
+
+  auth-deploy:
+    needs: sonar-scan
     uses: ./.github/workflows/gcp-auth.yml
     secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
 

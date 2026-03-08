@@ -1,0 +1,20 @@
+name: SonarQube Scan
+
+on:
+  workflow_call:
+
+jobs:
+  scan:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # O SonarQube precisa do histórico completo para análises mais precisas.
+          fetch-depth: 0
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
