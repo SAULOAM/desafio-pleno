@@ -88,3 +88,11 @@
 25. **Resolução de Permissão do Usuário e Limpeza do Projeto**:
     *   Encontrei o erro `IAM_PERMISSION_DENIED` ao tentar rodar comandos `gcloud` localmente. A causa é que meu usuário (`saulosk.silva@gmail.com`) não tinha a permissão `iam.serviceAccounts.create`. A solução foi adicionar a role `Service Account Admin` a este usuário no painel do IAM no GCP.
     *   Realizei uma limpeza no repositório, consolidando a lógica de Zero-Downtime (`RollingUpdate` e `probes`) no manifesto Kubernetes correto (`k8s/deployment.yaml`) e removendo arquivos de workflow e configuração duplicados/obsoletos para melhorar a organização e clareza do projeto.
+
+26. **Diagnóstico de Erro de Autenticação do Terraform no Pipeline**:
+    *   O pipeline falhou com o erro `Not found; Gaia id not found for email ***`. Este erro indica que a Service Account (`github-actions-sa@projeto-globo.iam.gserviceaccount.com`) que o GitHub Actions está tentando usar não existe no projeto GCP.
+    *   A solução é um pré-requisito de setup no ambiente GCP: criar a Service Account, garantir que ela tenha as roles necessárias (`Service Usage Admin`, `Kubernetes Engine Admin`, `Artifact Registry Admin`, `Storage Admin`) e, crucialmente, conceder a permissão `Workload Identity User` para que o pipeline do GitHub possa personificá-la.
+
+27. **Correção do ID do Projeto GCP**:
+    *   Identifiquei que o ID do projeto GCP criado automaticamente ou utilizado era `projeto-globo-489614`, e não apenas `projeto-globo`.
+    *   Atualizei todos os arquivos de configuração (`infra/provider.tf`, workflows de auth e deploy) para usar o ID correto e o e-mail correto da Service Account (`github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com`), garantindo que os recursos sejam criados e acessados no local certo.

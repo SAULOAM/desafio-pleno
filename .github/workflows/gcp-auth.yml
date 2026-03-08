@@ -27,9 +27,9 @@ jobs:
         if: steps.check_auth.outputs.status == 'unauthenticated'
         uses: 'google-github-actions/auth@v2'
         with:
-          project_id: 'projeto-globo'
+          project_id: 'projeto-globo-489614'
           workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool-globo/providers/github-pool-globo'
-          service_account: 'github-actions-sa@projeto-globo.iam.gserviceaccount.com'
+          service_account: 'github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com'
 
       - name: 'Verify Authentication'
         if: steps.check_auth.outputs.status == 'unauthenticated'

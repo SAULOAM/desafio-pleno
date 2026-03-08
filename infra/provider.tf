@@ -9,6 +9,6 @@ terraform {
 }
 
 provider "google" {
-  project = "projeto-globo"
+  project = "projeto-globo-489614"
   region  = "us-central1"
 }
