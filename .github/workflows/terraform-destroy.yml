@@ -1,0 +1,40 @@
+name: 'Terraform Destroy GCP'
+
+on:
+  workflow_call:
+
+jobs:
+  terraform:
+    name: 'Terraform Destroy GCP'
+    runs-on: ubuntu-latest
+    env:
+      # Diretório onde os arquivos do Terraform estão
+      TF_WORKING_DIR: 'infra'
+
+    # Permissões necessárias para o OIDC se comunicar com o GCP
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          # O caminho completo para o seu Workload Identity Provider
+          workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool-globo/providers/github-pool-globo'
+          # O e-mail da Service Account que o Terraform irá usar
+          service_account: 'github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform -chdir="${{ env.TF_WORKING_DIR }}" init
+
+      - name: Terraform Destroy
+        if: github.ref == 'refs/heads/main'
+        run: terraform -chdir="${{ env.TF_WORKING_DIR }}" destroy -auto-approve

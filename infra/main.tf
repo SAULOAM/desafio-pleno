@@ -25,6 +25,7 @@ resource "google_container_cluster" "primary" {
 
   # Remove o node pool padrão para usarmos um gerenciado separadamente
   remove_default_node_pool = true
+  initial_node_count       = 1
 
   # Desabilita proteção de deleção para facilitar testes/destruição
   deletion_protection = false

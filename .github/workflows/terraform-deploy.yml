@@ -46,14 +46,6 @@ jobs:
         if: github.ref == 'refs/heads/main' # Aplicar somente na branch main
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" apply -auto-approve
 
-      - name: Wait for 1 minute
-        if: github.ref == 'refs/heads/main'
-        run: sleep 60
-
-      - name: Terraform Destroy
-        if: github.ref == 'refs/heads/main'
-        run: terraform -chdir="${{ env.TF_WORKING_DIR }}" destroy -auto-approve
-
       - name: Rollback on Failure
         if: failure() && steps.apply.outcome == 'failure' # Executa apenas se o Apply falhar
         run: |
