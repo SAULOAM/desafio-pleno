@@ -23,30 +23,27 @@ resource "google_container_cluster" "primary" {
   name     = "desafio-pleno-cluster"
   location = "us-central1"
 
-  # Remove o node pool padrão para usarmos um gerenciado separadamente
-  remove_default_node_pool = true
+  # Configura o node pool diretamente no cluster para evitar problemas de quota com SSDs.
+  # Usar o node pool padrão é mais simples para este cenário.
+  remove_default_node_pool = false
   initial_node_count       = 1
 
-  # Desabilita proteção de deleção para facilitar testes/destruição
-  deletion_protection = false
-
-  depends_on = [google_project_service.container]
-}
-
-# Node Pool Gerenciado
-resource "google_container_node_pool" "primary_nodes" {
-  name       = "desafio-pleno-node-pool"
-  location   = "us-central1"
-  cluster    = google_container_cluster.primary.name
-  node_count = 1 # 1 nó é suficiente para um teste simples
-
   node_config {
-    preemptible  = true # Mais barato (Spot instances)
+    # Usa instâncias preemptivas (Spot) para reduzir custos.
+    preemptible  = true
     machine_type = "e2-medium"
     disk_size_gb = 20
+    # Define explicitamente o tipo de disco como 'pd-standard' para evitar o uso de SSD
+    # e contornar o erro de quota 'SSD_TOTAL_GB' excedida.
+    disk_type    = "pd-standard"
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
+
+  # Desabilita proteção de deleção para facilitar testes/destruição
+  deletion_protection = false
+
+  depends_on = [google_project_service.container]
 }
