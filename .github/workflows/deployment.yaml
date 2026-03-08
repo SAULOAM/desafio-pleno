@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-py
+spec:
+  # A estratégia de atualização é a chave para o Zero-Downtime.
+  # RollingUpdate é o padrão, mas é bom ser explícito.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # maxUnavailable: 0 -> Garante que o número de réplicas desejado esteja sempre disponível.
+      # O Kubernetes não derrubará um pod antigo até que um novo esteja pronto.
+      maxUnavailable: 0
+      # maxSurge: 1 -> Permite que o Kubernetes crie 1 pod a mais que o número de réplicas
+      # durante a atualização. Isso acelera o processo.
+      maxSurge: 1
+  replicas: 2 # Aumentado para 2 para um ambiente mais robusto e para a estratégia funcionar melhor.
+  selector:
+    matchLabels:
+      app: api-py
+  template:
+    metadata:
+      labels:
+        app: api-py
+    spec:
+      containers:
+      - name: api-py
+        image: IMAGE_PLACEHOLDER # Será substituído pelo pipeline
+        ports:
+        - containerPort: 8000
+        # Probes são essenciais para o Kubernetes saber o estado da sua aplicação.
+        readinessProbe:
+          # O readinessProbe verifica se o container está pronto para receber tráfego.
+          # O Kubernetes só direcionará tráfego para o pod após este probe passar.
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          # O livenessProbe verifica se o container ainda está "vivo".
+          # Se falhar, o Kubernetes reiniciará o container.
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-py-service
+  labels:
+    # Label necessária para o ServiceMonitor do Prometheus encontrar este serviço.
+    app: api-py
+spec:
+  type: LoadBalancer
+  selector:
+    app: api-py
+  ports:
+  - port: 80
+    targetPort: 8000
+    # Nomear a porta é crucial para o ServiceMonitor funcionar.
+    name: http

@@ -47,3 +47,69 @@ resource "google_container_cluster" "primary" {
 
   depends_on = [google_project_service.container]
 }
+
+# --- Configuração dos Providers para Helm ---
+data "google_client_config" "default" {}
+
+provider "kubernetes" {
+  host                   = "https://${google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = "https://${google_container_cluster.primary.endpoint}"
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+  }
+}
+
+# --- Stack de Monitoramento (Prometheus + Grafana) ---
+resource "helm_release" "prometheus_stack" {
+  name             = "prometheus-stack"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  namespace        = "monitoring"
+  create_namespace = true
+  version          = "57.0.1"
+
+  depends_on = [google_container_cluster.primary]
+
+  values = [
+    yamlencode({
+      prometheus = {
+        prometheusSpec = {
+          replicas = 1
+          storageSpec = {
+            volumeClaimTemplate = {
+              spec = {
+                accessModes = ["ReadWriteOnce"]
+                resources = { requests = { storage = "8Gi" } }
+              }
+            }
+          }
+        }
+        # Expõe o Prometheus via LoadBalancer
+        service = {
+          type = "LoadBalancer"
+        }
+      }
+      grafana = {
+        persistence = { enabled = true, size = "2Gi" }
+        adminPassword = "admin"
+        # Expõe o Grafana via LoadBalancer
+        service = {
+          type = "LoadBalancer"
+        }
+        sidecar = {
+          dashboards = {
+            enabled = true
+            searchNamespace = "default"
+          }
+        }
+      }
+      alertmanager = { enabled = false }
+    })
+  ]
+}

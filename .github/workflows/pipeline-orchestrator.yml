@@ -54,13 +54,35 @@ jobs:
       - name: Show Public IP
         run: |
           echo "Buscando serviços no cluster..."
-          kubectl get services
-          EXTERNAL_IP=$(kubectl get service -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
-          if [ -n "$EXTERNAL_IP" ]; then
-            echo "::notice title=API Endpoint::http://$EXTERNAL_IP:8000"
-            echo "--------------------------------------------------"
-            echo "API disponível em: http://$EXTERNAL_IP:8000"
-            echo "--------------------------------------------------"
+          
+          # Busca IP da API (Namespace default)
+          API_IP=$(kubectl get service api-py-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+          
+          # Busca IP do Grafana (Namespace monitoring)
+          GRAFANA_IP=$(kubectl get service -n monitoring prometheus-stack-grafana -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+          
+          # Busca IP do Prometheus (Namespace monitoring)
+          PROMETHEUS_IP=$(kubectl get service -n monitoring prometheus-stack-kube-prometheus-prometheus -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+
+          echo "--------------------------------------------------"
+          if [ -n "$API_IP" ]; then
+            echo "::notice title=API Endpoint::http://$API_IP:80"
+            echo "API: http://$API_IP:80"
           else
-            echo "::warning::IP externo ainda pendente ou não encontrado."
+            echo "::warning::API IP ainda pendente."
           fi
+
+          if [ -n "$GRAFANA_IP" ]; then
+            echo "::notice title=Grafana::http://$GRAFANA_IP:80"
+            echo "Grafana: http://$GRAFANA_IP:80 (User: admin | Pass: admin)"
+          else
+            echo "::warning::Grafana IP ainda pendente."
+          fi
+
+          if [ -n "$PROMETHEUS_IP" ]; then
+            echo "::notice title=Prometheus::http://$PROMETHEUS_IP:9090"
+            echo "Prometheus: http://$PROMETHEUS_IP:9090"
+          else
+            echo "::warning::Prometheus IP ainda pendente."
+          fi
+          echo "--------------------------------------------------"
