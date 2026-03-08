@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Diretório onde os arquivos do Terraform estão
-      TF_WORKING_DIR: 'infra'
+      TF_WORKING_DIR: '..infra'
 
     # Permissões necessárias para o OIDC se comunicar com o GCP
     permissions:
