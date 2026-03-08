@@ -52,3 +52,9 @@
 
 16. **Localizando a Chave de Projeto Exata**:
     *   Para encontrar a `projectKey` definitiva, o passo correto é clicar no nome do projeto (`desafio-pleno`) na lista e, na página do projeto, localizar a seção "Project Information" na coluna da direita. O valor contido no campo "Project Key" é a fonte da verdade. Ajustei a chave para `desafio-pleno`, que é o valor mais provável.
+
+17. **Diagnóstico Final: Problema de Token**:
+    *   O log de erro `Project not found` persistiu, mesmo com as chaves de organização e projeto aparentemente corretas. A mensagem de aviso `Running this GitHub Action without SONAR_TOKEN is not recommended` e o erro de permissão indicam que o problema final está no `SONAR_TOKEN` armazenado nos segredos do GitHub. A solução é gerar um novo token no SonarCloud e atualizá-lo no repositório do GitHub para garantir que a autenticação seja bem-sucedida.
+
+18. **Confirmação Visual da Chave do Projeto**:
+    *   Através da seção "Information" na interface do SonarCloud, confirmei que a **Project Key** exata é `SAULOAM_desafio-pleno` e a **Organization Key** é `sauloam`. Atualizei o arquivo `sonar-project.properties` com esses valores definitivos.
