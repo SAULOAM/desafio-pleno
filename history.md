@@ -58,3 +58,21 @@
 
 18. **Confirmação Visual da Chave do Projeto**:
     *   Através da seção "Information" na interface do SonarCloud, confirmei que a **Project Key** exata é `SAULOAM_desafio-pleno` e a **Organization Key** é `sauloam`. Atualizei o arquivo `sonar-project.properties` com esses valores definitivos.
+
+19. **Resolvendo Conflito de Análise no SonarCloud**:
+    *   O pipeline passou a falhar com um novo erro: `You are running CI analysis while Automatic Analysis is enabled`. Isso é um bom sinal, pois significa que a autenticação está funcionando e o projeto foi encontrado. O erro indica um conflito entre a análise via CI (configurada no GitHub Actions) e a funcionalidade de "Análise Automática" do SonarCloud. A solução é desabilitar a "Análise Automática" nas configurações do projeto no SonarCloud (`Administration` > `Analysis Method`).
+
+20. **Provisionamento de Kubernetes (GKE)**:
+    *   Para orquestrar o container da aplicação, decidi provisionar um cluster **Google Kubernetes Engine (GKE)** via Terraform.
+    *   Criei também um repositório no **Artifact Registry** para armazenar as imagens Docker da aplicação.
+    *   Utilizei máquinas *preemptible* (spot) no node pool para reduzir custos durante o desenvolvimento.
+
+21. **Pipeline de Deploy da Aplicação (CD)**:
+    *   Criei os manifestos do Kubernetes (`k8s/deployment.yaml`) definindo um Deployment e um Service (LoadBalancer) para a API.
+    *   Implementei um novo workflow (`app-deploy.yml`) que realiza o build da imagem Docker, faz o push para o Artifact Registry e aplica os manifestos no cluster GKE recém-criado.
+    *   Atualizei o orquestrador para executar o deploy da aplicação apenas após o sucesso do provisionamento da infraestrutura (`terraform-deploy`).
+
+22. **Garantindo Zero Downtime no Deploy**:
+    *   Para atender ao requisito de não haver indisponibilidade durante as atualizações, configurei a estratégia de `RollingUpdate` no manifesto do Kubernetes (`deployment.yaml`).
+    *   Defini `maxSurge: 1` e `maxUnavailable: 0`. Isso força o Kubernetes a criar um novo pod da aplicação e esperar que ele esteja totalmente pronto antes de remover o pod antigo, garantindo uma transição suave e sem interrupção do serviço.
+    *   Adicionei `readinessProbe` e `livenessProbe` para que o Kubernetes possa verificar ativamente a saúde da aplicação. O `readinessProbe` é crucial, pois impede que o tráfego seja enviado para um novo pod antes que ele esteja realmente pronto para processar requisições.

@@ -31,3 +31,8 @@ jobs:
     needs: auth-deploy
     uses: ./.github/workflows/terraform-deploy.yml
     secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
+
+  app-deploy:
+    needs: terraform-deploy
+    uses: ./.github/workflows/app-deploy.yml
+    secrets: inherit

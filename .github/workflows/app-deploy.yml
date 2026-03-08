@@ -1,0 +1,46 @@
+name: App Build & Deploy
+
+on:
+  workflow_call:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        env:
+          # Formato: REGION-docker.pkg.dev/PROJECT_ID/REPO_NAME/IMAGE_NAME:TAG
+          IMAGE_TAG: us-central1-docker.pkg.dev/projeto-globo/desafio-pleno-repo/api-py:${{ github.sha }}
+        run: |
+          docker build -t $IMAGE_TAG .
+          docker push $IMAGE_TAG
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: desafio-pleno-cluster
+          location: us-central1
+
+      - name: Deploy to GKE
+        env:
+          IMAGE_TAG: us-central1-docker.pkg.dev/projeto-globo/desafio-pleno-repo/api-py:${{ github.sha }}
+        run: |
+          # Substitui o placeholder no arquivo yaml pela imagem real com a tag (hash do commit)
+          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_TAG|g" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
