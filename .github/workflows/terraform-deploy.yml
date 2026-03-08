@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para ter o histórico do git para o revert
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -42,5 +44,19 @@ jobs:
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" plan -no-color
 
       - name: Terraform Apply
+        id: apply
         if: github.ref == 'refs/heads/main' # Aplicar somente na branch main
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" apply -auto-approve
+
+      - name: Rollback on Failure
+        if: failure() && steps.apply.outcome == 'failure' # Executa apenas se o Apply falhar
+        run: |
+          echo "🚨 Terraform Apply falhou. Iniciando Rollback..."
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git revert HEAD --no-edit
+          echo "🔄 Commit revertido. Reaplicando estado anterior..."
+          terraform -chdir="${{ env.TF_WORKING_DIR }}" plan -no-color
+          terraform -chdir="${{ env.TF_WORKING_DIR }}" apply -auto-approve
+          echo "❌ Rollback concluído com sucesso. Falhando a pipeline para notificar erro no deploy original."
+          exit 1

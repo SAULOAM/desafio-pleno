@@ -1,0 +1,20 @@
+name: Pipeline Orchestrator
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  demo:
+    uses: ./.github/workflows/github-actions-demo.yml
+
+  auth-deploy:
+    needs: demo
+    uses: ./.github/workflows/gcp-auth.yml
+    secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
+
+  terraform-deploy:
+    needs: auth-deploy
+    uses: ./.github/workflows/terraform-deploy.yml
+    secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
