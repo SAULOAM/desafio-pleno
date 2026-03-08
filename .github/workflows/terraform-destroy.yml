@@ -2,6 +2,7 @@ name: 'Terraform Destroy GCP'
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -36,5 +37,5 @@ jobs:
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" init
 
       - name: Terraform Destroy
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" destroy -auto-approve
