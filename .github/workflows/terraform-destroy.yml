@@ -2,12 +2,6 @@ name: 'Terraform Destroy GCP'
 
 on:
   workflow_call:
-  workflow_dispatch:
-    inputs:
-      confirmation:
-        description: 'Digite "DESTROY" para confirmar a destruição da infraestrutura'
-        required: true
-        default: ''
 
 jobs:
   terraform:
@@ -43,7 +37,11 @@ jobs:
 
       - name: Terraform Destroy
 <<<<<<< HEAD
+<<<<<<< HEAD
         if: (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.confirmation == 'DESTROY')
+=======
+        if: github.ref == 'refs/heads/main'
+>>>>>>> parent of 5886733 (implementing a k8s service simple with only one node, to deploy the api, using terraform e provisoning a artfactory to it)
 =======
         if: github.ref == 'refs/heads/main'
 >>>>>>> parent of 5886733 (implementing a k8s service simple with only one node, to deploy the api, using terraform e provisoning a artfactory to it)
