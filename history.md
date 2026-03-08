@@ -3,3 +3,5 @@ Resolvi Usar a GCP pra deployar a API, estou autenticando com o provider usando 
 gcloud auth login
 
 Adicionei a `required_version` no arquivo `provider.tf` para resolver um aviso do TFLint e garantir que o projeto use uma versão compatível do Terraform, evitando quebras inesperadas no futuro.
+
+Corrigi a configuração do SonarQube adicionando a propriedade `sonar.organization`, que é obrigatória para projetos no SonarCloud, resolvendo o erro de "exit code 3".
