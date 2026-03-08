@@ -40,4 +40,9 @@
     *   Decidi reverter a configuração do SonarCloud para a organização `sauloam` (SAULOAM), onde o projeto já estava configurado ou é mais fácil de gerenciar, simplificando a resolução do erro de "Project not found".
 
 12. **Correção da Chave do Projeto**:
-    *   Atualizei a `sonar.projectKey` para `sauloam` no arquivo de propriedades, garantindo que corresponda exatamente à chave definida no projeto dentro do SonarCloud.
+    *   Atualizei a `sonar.projectKey` para `sauloam` no arquivo de propriedades, garantindo que corresponda exatamente à chave definida no projeto dentro do SonarCloud.testing the sonar
+13. **Análise do Log de Erro do SonarCloud**:
+    *   O log de erro `Could not find a default branch for project with key 'sauloam'` confirmou que a chave do projeto estava incorreta. Reverti a `sonar.projectKey` para o valor mais provável (`SAULOAM_desafio-pleno`), que segue o padrão gerado pelo SonarCloud ao importar um repositório.
+
+14. **Correção Final da Organização SonarCloud**:
+    *   Verifiquei nas configurações da organização que a **Key** correta é `sauloam` (minúsculo), enquanto "SAULO DANIEL" é apenas o nome de exibição. Atualizei `sonar.organization` para `sauloam` e `sonar.projectKey` para `sauloam_desafio-pleno` para corresponder à chave real da organização e ao padrão de projeto.
