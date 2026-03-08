@@ -22,15 +22,10 @@ jobs:
     needs: demo
     uses: ./.github/workflows/terraform-lint.yml
 
-  auth-deploy:
-    needs: [sonar-scan, terraform-lint]
-    uses: ./.github/workflows/gcp-auth.yml
-    secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
-
   terraform-deploy:
-    needs: auth-deploy
+    needs: [sonar-scan, terraform-lint]
     uses: ./.github/workflows/terraform-deploy.yml
-    secrets: inherit # Importante: passa os segredos (como GCP_PROJECT_NUMBER) para o workflow chamado
+    secrets: inherit
 
   app-deploy:
     needs: terraform-deploy

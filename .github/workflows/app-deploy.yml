@@ -9,6 +9,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      IMAGE_TAG: us-central1-docker.pkg.dev/projeto-globo-489614/desafio-pleno-repo/api-py:${{ github.sha }}
 
     steps:
       - name: Checkout
@@ -24,9 +26,6 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push Docker Image
-        env:
-          # Formato: REGION-docker.pkg.dev/PROJECT_ID/REPO_NAME/IMAGE_NAME:TAG
-          IMAGE_TAG: us-central1-docker.pkg.dev/projeto-globo-489614/desafio-pleno-repo/api-py:${{ github.sha }}
         run: |
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
@@ -38,8 +37,6 @@ jobs:
           location: us-central1
 
       - name: Deploy to GKE
-        env:
-          IMAGE_TAG: us-central1-docker.pkg.dev/projeto-globo-489614/desafio-pleno-repo/api-py:${{ github.sha }}
         run: |
           # Substitui o placeholder no arquivo yaml pela imagem real com a tag (hash do commit)
           sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_TAG|g" infra/k8s/deployment.yaml
