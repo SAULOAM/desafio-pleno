@@ -81,3 +81,10 @@
     *   O pipeline falhou com o erro `Not found; Gaia id not found for email ***`. Este erro indica que a Service Account (`github-actions-sa@projeto-globo.iam.gserviceaccount.com`) que o GitHub Actions está tentando usar não existe no projeto GCP ou não tem as permissões de Workload Identity configuradas.
     *   A solução é criar a Service Account no GCP, garantir que ela tenha as roles necessárias (`Service Usage Admin`, `Kubernetes Engine Admin`, `Artifact Registry Admin`) e que a Workload Identity Pool tenha permissão para personificá-la (`Workload Identity User`).
     *   Como melhoria, alterei `disable_on_destroy = true` para `false` nos recursos `google_project_service` para garantir que o `terraform destroy` limpe completamente o ambiente, desativando as APIs.
+
+24. **Execução de Scripts de Setup GCP**:
+    *   Para resolver o erro de "Gaia id not found", executei (ou documentei a necessidade de executar) os comandos `gcloud` para criar a Service Account `github-actions-sa` e configurar as permissões de IAM e Workload Identity Federation, já que esses são pré-requisitos para que o Terraform possa rodar via GitHub Actions.
+
+25. **Resolução de Permissão do Usuário e Limpeza do Projeto**:
+    *   Encontrei o erro `IAM_PERMISSION_DENIED` ao tentar rodar comandos `gcloud` localmente. A causa é que meu usuário (`saulosk.silva@gmail.com`) não tinha a permissão `iam.serviceAccounts.create`. A solução foi adicionar a role `Service Account Admin` a este usuário no painel do IAM no GCP.
+    *   Realizei uma limpeza no repositório, consolidando a lógica de Zero-Downtime (`RollingUpdate` e `probes`) no manifesto Kubernetes correto (`k8s/deployment.yaml`) e removendo arquivos de workflow e configuração duplicados/obsoletos para melhorar a organização e clareza do projeto.
