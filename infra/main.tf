@@ -1,12 +1,12 @@
 # Habilitar APIs necessárias
 resource "google_project_service" "container" {
   service            = "container.googleapis.com"
-  disable_on_destroy = false # Permite que o terraform destroy desabilite a API
+  disable_on_destroy = false # Não desabilita a API ao destruir (evita erros em projetos compartilhados)
 }
 
 resource "google_project_service" "artifactregistry" {
   service            = "artifactregistry.googleapis.com"
-  disable_on_destroy = false # Permite que o terraform destroy desabilite a API
+  disable_on_destroy = false # Não desabilita a API ao destruir (evita erros em projetos compartilhados)
 }
 
 # Artifact Registry para armazenar as imagens Docker
@@ -35,7 +35,7 @@ resource "google_container_cluster" "primary" {
     disk_size_gb = 10
     # Define explicitamente o tipo de disco como 'pd-standard' para evitar o uso de SSD
     # e contornar o erro de quota 'SSD_TOTAL_GB' excedida.
-    disk_type = "pd-standard"
+    disk_type    = "pd-standard"
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
