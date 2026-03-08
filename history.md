@@ -46,3 +46,9 @@
 
 14. **Correção Final da Organização SonarCloud**:
     *   Verifiquei nas configurações da organização que a **Key** correta é `sauloam` (minúsculo), enquanto "SAULO DANIEL" é apenas o nome de exibição. Atualizei `sonar.organization` para `sauloam` e `sonar.projectKey` para `sauloam_desafio-pleno` para corresponder à chave real da organização e ao padrão de projeto.
+
+15. **Limpeza de Configuração do SonarCloud**:
+    *   Com base na confirmação visual do painel do SonarCloud, removi uma linha duplicada e incorreta (`sSAULOAM-chh7g@github`) do arquivo `sonar-project.properties`, mantendo apenas a chave de organização correta `sauloam`.
+
+16. **Localizando a Chave de Projeto Exata**:
+    *   Para encontrar a `projectKey` definitiva, o passo correto é clicar no nome do projeto (`desafio-pleno`) na lista e, na página do projeto, localizar a seção "Project Information" na coluna da direita. O valor contido no campo "Project Key" é a fonte da verdade. Ajustei a chave para `desafio-pleno`, que é o valor mais provável.
