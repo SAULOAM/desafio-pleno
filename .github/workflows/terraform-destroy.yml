@@ -42,5 +42,9 @@ jobs:
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" init
 
       - name: Terraform Destroy
+<<<<<<< HEAD
         if: (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.confirmation == 'DESTROY')
+=======
+        if: github.ref == 'refs/heads/main'
+>>>>>>> parent of 5886733 (implementing a k8s service simple with only one node, to deploy the api, using terraform e provisoning a artfactory to it)
         run: terraform -chdir="${{ env.TF_WORKING_DIR }}" destroy -auto-approve
