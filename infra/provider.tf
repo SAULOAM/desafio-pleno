@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.3" # Garante que o código rode com uma versão compatível do Terraform
   required_providers {
     google = {
       source  = "hashicorp/google"
