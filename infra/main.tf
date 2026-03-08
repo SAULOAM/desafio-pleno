@@ -1,12 +1,12 @@
 # Habilitar APIs necessárias
 resource "google_project_service" "container" {
   service            = "container.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false # Permite que o terraform destroy desabilite a API
 }
 
 resource "google_project_service" "artifactregistry" {
   service            = "artifactregistry.googleapis.com"
-  disable_on_destroy = true
+  disable_on_destroy = false # Permite que o terraform destroy desabilite a API
 }
 
 # Artifact Registry para armazenar as imagens Docker

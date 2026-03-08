@@ -76,3 +76,8 @@
     *   Para atender ao requisito de não haver indisponibilidade durante as atualizações, configurei a estratégia de `RollingUpdate` no manifesto do Kubernetes (`deployment.yaml`).
     *   Defini `maxSurge: 1` e `maxUnavailable: 0`. Isso força o Kubernetes a criar um novo pod da aplicação e esperar que ele esteja totalmente pronto antes de remover o pod antigo, garantindo uma transição suave e sem interrupção do serviço.
     *   Adicionei `readinessProbe` e `livenessProbe` para que o Kubernetes possa verificar ativamente a saúde da aplicação. O `readinessProbe` é crucial, pois impede que o tráfego seja enviado para um novo pod antes que ele esteja realmente pronto para processar requisições.
+
+23. **Diagnóstico de Erro de Autenticação do Terraform**:
+    *   O pipeline falhou com o erro `Not found; Gaia id not found for email ***`. Este erro indica que a Service Account (`github-actions-sa@projeto-globo.iam.gserviceaccount.com`) que o GitHub Actions está tentando usar não existe no projeto GCP ou não tem as permissões de Workload Identity configuradas.
+    *   A solução é criar a Service Account no GCP, garantir que ela tenha as roles necessárias (`Service Usage Admin`, `Kubernetes Engine Admin`, `Artifact Registry Admin`) e que a Workload Identity Pool tenha permissão para personificá-la (`Workload Identity User`).
+    *   Como melhoria, alterei `disable_on_destroy = true` para `false` nos recursos `google_project_service` para garantir que o `terraform destroy` limpe completamente o ambiente, desativando as APIs.
