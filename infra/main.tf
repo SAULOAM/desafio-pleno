@@ -80,12 +80,16 @@ resource "helm_release" "prometheus_stack" {
     yamlencode({
       prometheus = {
         prometheusSpec = {
-          replicas = 1
+          replicas    = 1
           storageSpec = {
             volumeClaimTemplate = {
               spec = {
                 accessModes = ["ReadWriteOnce"]
-                resources = { requests = { storage = "8Gi" } }
+                resources = {
+                  requests = {
+                    storage = "8Gi"
+                  }
+                }
               }
             }
           }
@@ -96,7 +100,10 @@ resource "helm_release" "prometheus_stack" {
         }
       }
       grafana = {
-        persistence = { enabled = true, size = "2Gi" }
+        persistence = {
+          enabled = true
+          size    = "2Gi"
+        }
         adminPassword = "admin"
         # Expõe o Grafana via LoadBalancer
         service = {
@@ -104,12 +111,14 @@ resource "helm_release" "prometheus_stack" {
         }
         sidecar = {
           dashboards = {
-            enabled = true
+            enabled         = true
             searchNamespace = "default"
           }
         }
       }
-      alertmanager = { enabled = false }
+      alertmanager = {
+        enabled = false
+      }
     })
   ]
 }
