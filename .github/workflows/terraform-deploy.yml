@@ -28,9 +28,9 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           # O caminho completo para o seu Workload Identity Provider
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool-globo/providers/github-pool-globo'
           # O e-mail da Service Account que o Terraform irá usar
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          service_account: 'github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2

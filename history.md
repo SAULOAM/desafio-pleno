@@ -96,3 +96,7 @@
 27. **Correção do ID do Projeto GCP**:
     *   Identifiquei que o ID do projeto GCP criado automaticamente ou utilizado era `projeto-globo-489614`, e não apenas `projeto-globo`.
     *   Atualizei todos os arquivos de configuração (`infra/provider.tf`, workflows de auth e deploy) para usar o ID correto e o e-mail correto da Service Account (`github-actions-sa@projeto-globo-489614.iam.gserviceaccount.com`), garantindo que os recursos sejam criados e acessados no local certo.
+
+28. **Correção de Credenciais nos Workflows de Deploy**:
+    *   O erro `Gaia id not found` persistiu durante a execução do Terraform. Diagnostiquei que, embora o arquivo `gcp-auth.yml` tivesse sido atualizado, os workflows `terraform-deploy.yml` e `app-deploy.yml` ainda estavam consumindo os segredos do GitHub (`GCP_SERVICE_ACCOUNT`), que continham o e-mail da Service Account antiga.
+    *   Atualizei esses workflows para usar explicitamente o e-mail da nova Service Account (`github-actions-sa@projeto-globo-489614...`) e padronizei a configuração do Workload Identity Provider.
