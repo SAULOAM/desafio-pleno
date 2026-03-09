@@ -63,3 +63,27 @@ resource "google_container_cluster" "primary" {
 
   depends_on = [google_project_service.container]
 }
+
+# --- Netdata para Monitoramento em Tempo Real ---
+resource "helm_release" "netdata" {
+  name             = "netdata"
+  repository       = "https://netdata.github.io/helmchart/"
+  chart            = "netdata"
+  namespace        = "netdata"
+  create_namespace = true
+
+  depends_on = [google_container_cluster.primary]
+
+  values = [
+    yamlencode({
+      service = {
+        type = "LoadBalancer"
+      }
+      parent = {
+        claiming = {
+          enabled = false
+        }
+      }
+    })
+  ]
+}

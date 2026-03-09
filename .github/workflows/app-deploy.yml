@@ -57,3 +57,13 @@ jobs:
 
           echo "✅ Deploy concluído! Acesse a API em:"
           echo "http://$EXTERNAL_IP:80/api/comment/list/1"
+
+          echo "Aguardando IP externo do Netdata..."
+          NETDATA_IP=""
+          while [ -z "$NETDATA_IP" ]; do
+            sleep 10
+            NETDATA_IP=$(kubectl get svc -n netdata netdata -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          done
+
+          echo "📊 Monitoramento Netdata disponível em:"
+          echo "http://$NETDATA_IP:19999"

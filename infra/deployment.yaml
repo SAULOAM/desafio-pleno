@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-py
+spec:
+  # Estratégia para garantir zero downtime durante o deploy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1       # Permite criar 1 pod novo acima do número de réplicas desejado
+      maxUnavailable: 0 # Garante que nenhum pod antigo seja removido antes do novo estar pronto
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-py
+  template:
+    metadata:
+      labels:
+        app: api-py
+    spec:
+      containers:
+      - name: api-py
+        image: IMAGE_PLACEHOLDER # Será substituído pelo pipeline
+        ports:
+        - containerPort: 8000
+        # Probes para que o Kubernetes verifique a saúde da aplicação
+        readinessProbe:
+          # Verifica se a aplicação está pronta para receber tráfego
+          httpGet:
+            path: /api/comment/list/1 # Endpoint que deve retornar HTTP 200
+            port: 8000
+          initialDelaySeconds: 10 # Aguarda 10s antes da primeira verificação
+          periodSeconds: 5
+        livenessProbe:
+          # Verifica se a aplicação ainda está funcional; se falhar, o pod é reiniciado
+          httpGet:
+            path: /api/comment/list/1 # Endpoint que deve retornar HTTP 200
+            port: 8000
+          initialDelaySeconds: 20 # Aguarda 20s antes da primeira verificação
+          periodSeconds: 15
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-py-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: api-py
+  ports:
+  - port: 80
+    targetPort: 8000
