@@ -34,7 +34,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name: desafio-pleno-cluster
-          location: us-central1
+          location: us-central1-a
 
       - name: Deploy to GKE
         run: |
