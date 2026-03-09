@@ -21,7 +21,7 @@ spec:
       containers:
       - name: api-py
         image: IMAGE_PLACEHOLDER # Será substituído pelo pipeline
-        command: ["gunicorn", "-b", "0.0.0.0:8000", "api:app"]
+        command: ["python", "-m", "gunicorn", "-b", "0.0.0.0:8000", "api:app"]
         ports:
         - containerPort: 8000
         # Probes para que o Kubernetes verifique a saúde da aplicação
