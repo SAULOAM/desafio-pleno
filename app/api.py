@@ -53,7 +53,4 @@ def api_comment_list(content_id):
 
 
 
-
-
-
         
