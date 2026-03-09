@@ -21,20 +21,19 @@ spec:
       containers:
       - name: api-py
         image: IMAGE_PLACEHOLDER # Será substituído pelo pipeline
+        command: ["gunicorn", "-b", "0.0.0.0:8000", "api:app"]
         ports:
         - containerPort: 8000
         # Probes para que o Kubernetes verifique a saúde da aplicação
         readinessProbe:
           # Verifica se a aplicação está pronta para receber tráfego
-          httpGet:
-            path: /api/comment/list/1 # Endpoint que deve retornar HTTP 200
+          tcpSocket:
             port: 8000
           initialDelaySeconds: 10 # Aguarda 10s antes da primeira verificação
           periodSeconds: 5
         livenessProbe:
           # Verifica se a aplicação ainda está funcional; se falhar, o pod é reiniciado
-          httpGet:
-            path: /api/comment/list/1 # Endpoint que deve retornar HTTP 200
+          tcpSocket:
             port: 8000
           initialDelaySeconds: 20 # Aguarda 20s antes da primeira verificação
           periodSeconds: 15
