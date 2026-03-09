@@ -31,8 +31,3 @@ jobs:
     needs: terraform-deploy
     uses: ./.github/workflows/app-deploy.yml
     secrets: inherit
-
-  terraform-destroy:
-    needs: app-deploy
-    uses: ./.github/workflows/terraform-destroy.yml
-    secrets: inherit
