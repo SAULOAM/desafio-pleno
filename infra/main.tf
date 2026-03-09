@@ -64,6 +64,24 @@ resource "google_container_cluster" "primary" {
   depends_on = [google_project_service.container]
 }
 
+# --- Configuração dos Providers para Helm e Kubernetes ---
+# Estes providers são configurados dinamicamente para que o Terraform possa
+# se autenticar no cluster GKE recém-criado e instalar os charts do Helm.
+data "google_client_config" "default" {}
+
+provider "kubernetes" {
+  host                   = "https://${google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = "https://${google_container_cluster.primary.endpoint}"
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
+  }
+}
 # --- Netdata para Monitoramento em Tempo Real ---
 resource "helm_release" "netdata" {
   name             = "netdata"
