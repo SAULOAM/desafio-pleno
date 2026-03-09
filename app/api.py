@@ -49,3 +49,11 @@ def api_comment_list(content_id):
                 'message': message,
                 }
         return jsonify(response), 404
+
+
+
+
+
+
+
+        
