@@ -39,8 +39,8 @@ jobs:
       - name: Deploy to GKE
         run: |
           # Substitui o placeholder no arquivo yaml pela imagem real com a tag (hash do commit)
-          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_TAG|g" infra/k8s/deployment.yml
-          kubectl apply -f infra/k8s/deployment.yml
+          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_TAG|g" infra/deployment.yaml
+          kubectl apply -f infra/deployment.yaml
 
       - name: Get Service URL
         run: |
