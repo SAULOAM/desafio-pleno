@@ -101,6 +101,16 @@ resource "helm_release" "netdata" {
         claiming = {
           enabled = false
         }
+        # Desabilita persistência para evitar que o pod fique 'Pending' aguardando disco
+        persistence = {
+          enabled = false
+        }
+        # Configuração para liberar acesso anônimo (sem token)
+        configs = {
+          netdata = {
+            data = "[web]\n    allow dashboard from = *"
+          }
+        }
       }
     })
   ]
