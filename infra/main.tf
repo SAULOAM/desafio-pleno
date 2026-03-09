@@ -41,7 +41,7 @@ resource "google_container_cluster" "primary" {
   # Configura o node pool diretamente no cluster para evitar problemas de quota com SSDs.
   # Usar o node pool padrão é mais simples para este cenário.
   remove_default_node_pool = false
-  initial_node_count       = 1
+  initial_node_count       = 2
 
   node_config {
     # Usa instâncias preemptivas (Spot) para reduzir custos.
