@@ -18,6 +18,19 @@ resource "google_artifact_registry_repository" "repo" {
   depends_on    = [google_project_service.artifactregistry]
 }
 
+# Service Account dedicada para os nós do GKE
+resource "google_service_account" "gke_nodes" {
+  account_id   = "gke-nodes-sa"
+  display_name = "GKE Nodes Service Account"
+}
+
+# Permissão para ler imagens do Artifact Registry
+resource "google_project_iam_member" "gke_nodes_artifact_registry" {
+  project = "projeto-globo-489614"
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.gke_nodes.email}"
+}
+
 # Cluster GKE
 resource "google_container_cluster" "primary" {
   name     = "desafio-pleno-cluster"
@@ -32,7 +45,8 @@ resource "google_container_cluster" "primary" {
     # Usa instâncias preemptivas (Spot) para reduzir custos.
     preemptible  = true
     machine_type = "e2-medium"
-    disk_size_gb = 20
+    disk_size_gb = 30
+    service_account = google_service_account.gke_nodes.email
     # Define explicitamente o tipo de disco como 'pd-standard' para evitar o uso de SSD
     # e contornar o erro de quota 'SSD_TOTAL_GB' excedida.
     disk_type = "pd-standard"
