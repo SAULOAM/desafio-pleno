@@ -82,34 +82,23 @@ provider "helm" {
     cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
   }
 }
-# --- Netdata para Monitoramento em Tempo Real ---
-resource "helm_release" "netdata" {
-  name             = "netdata"
-  repository       = "https://netdata.github.io/helmchart/"
-  chart            = "netdata"
-  namespace        = "netdata"
+
+# --- Stack de Monitoramento (Prometheus + Grafana) ---
+resource "helm_release" "prometheus_stack" {
+  name             = "prometheus-stack"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  namespace        = "monitoring"
   create_namespace = true
 
   depends_on = [google_container_cluster.primary]
 
   values = [
     yamlencode({
-      service = {
-        type = "LoadBalancer"
-      }
-      parent = {
-        claiming = {
-          enabled = false
-        }
-        # Desabilita persistência para evitar que o pod fique 'Pending' aguardando disco
-        persistence = {
-          enabled = false
-        }
-        # Configuração para liberar acesso anônimo (sem token)
-        configs = {
-          netdata = {
-            data = "[web]\n    allow dashboard from = *"
-          }
+      grafana = {
+        adminPassword = "admin"
+        service = {
+          type = "LoadBalancer"
         }
       }
     })
