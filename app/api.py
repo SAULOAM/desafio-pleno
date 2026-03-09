@@ -50,7 +50,3 @@ def api_comment_list(content_id):
                 }
         return jsonify(response), 404
 
-
-
-
-        
