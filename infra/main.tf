@@ -25,16 +25,18 @@ resource "google_service_account" "gke_nodes" {
 }
 
 # Permissão para ler imagens do Artifact Registry
-resource "google_project_iam_member" "gke_nodes_artifact_registry" {
-  project = "projeto-globo-489614"
-  role    = "roles/artifactregistry.reader"
-  member  = "serviceAccount:${google_service_account.gke_nodes.email}"
+resource "google_artifact_registry_repository_iam_member" "gke_nodes_artifact_registry" {
+  project    = google_artifact_registry_repository.repo.project
+  location   = google_artifact_registry_repository.repo.location
+  repository = google_artifact_registry_repository.repo.name
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${google_service_account.gke_nodes.email}"
 }
 
 # Cluster GKE
 resource "google_container_cluster" "primary" {
   name     = "desafio-pleno-cluster"
-  location = "us-central1"
+  location = "us-central1-a"
 
   # Configura o node pool diretamente no cluster para evitar problemas de quota com SSDs.
   # Usar o node pool padrão é mais simples para este cenário.
