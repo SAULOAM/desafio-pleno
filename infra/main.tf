@@ -43,13 +43,13 @@ resource "google_container_cluster" "primary" {
 
   node_config {
     # Usa instâncias preemptivas (Spot) para reduzir custos.
-    preemptible  = true
-    machine_type = "e2-medium"
-    disk_size_gb = 30
+    preemptible     = true
+    machine_type    = "e2-medium"
+    disk_size_gb    = 30
     service_account = google_service_account.gke_nodes.email
     # Define explicitamente o tipo de disco como 'pd-standard' para evitar o uso de SSD
     # e contornar o erro de quota 'SSD_TOTAL_GB' excedida.
-    disk_type = "pd-standard"
+    disk_type       = "pd-standard"
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
